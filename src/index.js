@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return await response.json();
     } catch (error) {
       console.error(error);
+      
     }
   };
 
@@ -24,6 +25,23 @@ document.addEventListener('DOMContentLoaded', () => {
     runtime.textContent = `${movieDetails.runtime} minutes`;
     showtime.textContent = movieDetails.showtime;
     availableTickets.textContent = movieDetails.capacity - movieDetails.tickets_sold;
+
+    // Check if tickets are sold out
+    if (movieDetails.capacity <= movieDetails.tickets_sold) {
+      document.getElementById('buy-ticket').disabled = true;
+      document.getElementById('buy-ticket').textContent = 'Sold Out';
+      const filmItem = document.querySelector(`.film.item[data-id="${movieDetails.id}"]`);
+      if (filmItem) {
+        filmItem.classList.add('sold-out');
+      }
+    } else {
+      document.getElementById('buy-ticket').disabled = false;
+      document.getElementById('buy-ticket').textContent = 'Buy Ticket';
+      const filmItem = document.querySelector(`.film.item[data-id="${movieDetails.id}"]`);
+      if (filmItem) {
+        filmItem.classList.remove('sold-out');
+      }
+    }
   };
 
   const buyTicket = async (movieId) => {
@@ -37,10 +55,28 @@ document.addEventListener('DOMContentLoaded', () => {
           tickets_sold: parseInt(availableTickets.textContent) + 1,
         }),
       });
+
       if (!response.ok) {
         throw new Error('Failed to buy ticket');
       }
-      // Optionally, you can update the UI after buying a ticket
+
+      // Fetch updated movie details after purchasing the ticket
+      const updatedMovieDetails = await fetchMovieDetails(movieId);
+      
+      if (updatedMovieDetails) {
+        // Update the UI with the new movie details, including the number of available tickets
+        updateMovieDetails(updatedMovieDetails);
+
+        // Check if tickets are sold out
+        if (updatedMovieDetails.capacity <= updatedMovieDetails.tickets_sold) {
+          document.getElementById('buy-ticket').disabled = true;
+          document.getElementById('buy-ticket').textContent = 'Sold Out';
+          const filmItem = document.querySelector(`.film.item[data-id="${updatedMovieDetails.id}"]`);
+          if (filmItem) {
+            filmItem.classList.add('sold-out');
+          }
+        }
+      }
     } catch (error) {
       console.error(error);
     }
@@ -77,7 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const movieId = selectedMovieItem.dataset.id;
       await buyTicket(movieId);
     } else {
-      console.error('No movie selected');
+      //console.error('No movie selected');
+      // You can also display an error message to the user or handle it in another way
     }
   });
 
