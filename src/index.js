@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return await response.json();
     } catch (error) {
       console.error(error);
-      
     }
   };
 
@@ -26,19 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
     showtime.textContent = movieDetails.showtime;
     availableTickets.textContent = movieDetails.capacity - movieDetails.tickets_sold;
 
-    // Check if tickets are sold out
+    const buyTicketButton = document.getElementById('buy-ticket');
+
     if (movieDetails.capacity <= movieDetails.tickets_sold) {
-      document.getElementById('buy-ticket').disabled = true;
-      document.getElementById('buy-ticket').textContent = 'Sold Out';
-      const filmItem = document.querySelector(`.film.item[data-id="${movieDetails.id}"]`);
-      if (filmItem) {
-        filmItem.classList.add('sold-out');
-      }
+      buyTicketButton.disabled = true;
+      buyTicketButton.textContent = 'Sold Out';
     } else {
-      document.getElementById('buy-ticket').disabled = false;
-      document.getElementById('buy-ticket').textContent = 'Buy Ticket';
-      const filmItem = document.querySelector(`.film.item[data-id="${movieDetails.id}"]`);
-      if (filmItem) {
+      buyTicketButton.disabled = false;
+      buyTicketButton.textContent = 'Buy Ticket';
+    }
+
+    const filmItem = document.querySelector(`.film.item[data-id="${movieDetails.id}"]`);
+    if (filmItem) {
+      if (movieDetails.capacity <= movieDetails.tickets_sold) {
+        filmItem.classList.add('sold-out');
+      } else {
         filmItem.classList.remove('sold-out');
       }
     }
@@ -60,22 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('Failed to buy ticket');
       }
 
-      // Fetch updated movie details after purchasing the ticket
       const updatedMovieDetails = await fetchMovieDetails(movieId);
       
       if (updatedMovieDetails) {
-        // Update the UI with the new movie details, including the number of available tickets
         updateMovieDetails(updatedMovieDetails);
-
-        // Check if tickets are sold out
-        if (updatedMovieDetails.capacity <= updatedMovieDetails.tickets_sold) {
-          document.getElementById('buy-ticket').disabled = true;
-          document.getElementById('buy-ticket').textContent = 'Sold Out';
-          const filmItem = document.querySelector(`.film.item[data-id="${updatedMovieDetails.id}"]`);
-          if (filmItem) {
-            filmItem.classList.add('sold-out');
-          }
-        }
       }
     } catch (error) {
       console.error(error);
@@ -106,19 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Event listener for the "Buy Ticket" button
   document.getElementById('buy-ticket').addEventListener('click', async () => {
     const selectedMovieItem = document.querySelector('.film.item.active');
     if (selectedMovieItem) {
       const movieId = selectedMovieItem.dataset.id;
       await buyTicket(movieId);
-    } else {
-      //console.error('No movie selected');
-      // You can also display an error message to the user or handle it in another way
     }
   });
 
-  // Example of deleting a film when the "Delete" button is clicked
   document.querySelectorAll('.delete-button').forEach(button => {
     button.addEventListener('click', async (event) => {
       const movieId = event.target.dataset.id;
