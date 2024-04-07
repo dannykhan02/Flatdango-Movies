@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flatdango - Buy Movie Tickets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css">
+  <link rel="stylesheet" href="assets/index.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="heading">
+    <div class="item">
+      <h2 class="ui header">
+        <i class="orange ticket icon"></i>
+        <div class="content">FLATDANGO</div>
+        <div class="sub header" id="subtitle">BUY MOVIE TICKETS</div>
+      </h2>
+    </div>
+  </div>
+
+  <div class="ui centered grid">
+    <div class="four wide column">
+      <div class="list-container">
+        <!-- Side menu -->
+        <ul class="ui divided list" id="films">
+          <li class="film item" data-id="1">The Giant Gila Monster</li>
+          <li class="film item" data-id="2">Manos: The Hands Of Fate</li>
+          <li class="film item" data-id="3">Time Chasers</li>
+          <li class="film item" data-id="4">The Touch Of Satan</li>
+          <li class="film item" data-id="5">Santa Claus Conquers The Martians</li>
+          <li class="film item" data-id="6">Track Of The Moon Beast</li>
+          <li class="film item" data-id="7">The Skydivers</li>
+          <li class="film item" data-id="8">The Killer Shrews</li>
+          <li class="film item" data-id="9">Project Moon Base</li>
+          <li class="film item" data-id="10">The Giant Spider Invasion</li>
+          <li class="film item" data-id="11">Catalina Caper</li>
+          <li class="film item" data-id="12">Secret Agent Super Dragon</li></li>
+          <li class="film item" data-id="13">Wild Rebels</li>
+          <li ></li>
+          <li class="film item" data-id="14">Danger: Diabolik</li>
+          <li class="film item" data-id="15">Village Of The Giants</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Poster -->
+    <div class="four wide column">
+      <img id="poster" src="assets/placeholderImage.png" alt="[MOVIE TITLE]">
+    </div>
+
+    <!-- Showing info -->
+    <div class="four wide column">
+      <div class="ui cards" id="showing">
+        <div class="card">
+          <div id="title" class="title">[MOVIE TITLE]</div>
+          <div id="runtime" class="meta">[RUNTIME] minutes</div>
+          <div class="content">
+            <div class="description">
+              <div id="film-info">[INSERT MOVIE DESCRIPTION HERE]</div>
+              <span id="showtime" class="ui label">[SHOWTIME]</span>
+              <span id="ticket-num">[X]</span> remaining tickets
+            </div>
+          </div>
+          <div class="extra content">
+            <button id="buy-ticket" class="ui orange button">Buy Ticket</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ <script src="src/index.js"></script>
+</body>
+</html>

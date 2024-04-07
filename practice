@@ -1,0 +1,137 @@
+// This part ensures that the DOM (Document Object Model) is fully loaded before executing the JavaScript code inside.
+document.addEventListener('DOMContentLoaded', () => {
+  
+    // These lines of code are getting references to various elements in the HTML document using their IDs.
+    const filmsList = document.getElementById('films');
+    const poster = document.getElementById('poster');
+    const title = document.getElementById('title');
+    const runtime = document.getElementById('runtime');
+    const showtime = document.getElementById('showtime');
+    const availableTickets = document.getElementById('ticket-num');
+  
+    // This function fetches movie details from the server using a provided movie ID.
+    const fetchMovieDetails = async (movieId) => {
+      try {
+        const response = await fetch(`http://localhost:3000/films/${movieId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch movie details');
+        }
+        return await response.json(); // Return the JSON data received from the server
+      } catch (error) {
+        console.error(error); // Log any errors that occur during the fetch operation
+      }
+    };
+  
+    // This function updates the movie details displayed on the webpage with the provided movie details.
+    const updateMovieDetails = (movieDetails) => {
+      poster.src = movieDetails.poster;
+      title.textContent = movieDetails.title;
+      runtime.textContent = `${movieDetails.runtime} minutes`;
+      showtime.textContent = movieDetails.showtime;
+      availableTickets.textContent = movieDetails.capacity - movieDetails.tickets_sold;
+  
+      // Check if the movie is sold out and update the buy ticket button accordingly
+      if (movieDetails.capacity - movieDetails.tickets_sold === 0) {
+        const buyButton = document.getElementById('buy-ticket');
+        buyButton.disabled = true;
+        buyButton.textContent = 'Sold Out';
+      }
+    };
+  
+    // This event listener listens for clicks on movie items in the films list.
+    filmsList.addEventListener('click', async (event) => {
+      if (event.target.classList.contains('film')) { // Check if the clicked element has the class 'film'
+        const movieId = event.target.dataset.id; // Retrieve the movie ID from the clicked element's dataset
+        const movieDetails = await fetchMovieDetails(movieId); // Fetch movie details from the server
+        updateMovieDetails(movieDetails); // Update the movie details displayed on the webpage
+      }
+    });
+  
+    // This function fetches details of the first movie when the page loads.
+    const fetchFirstMovieDetails = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/films/1'); // Fetch details of the first movie from the server
+        if (!response.ok) {
+          throw new Error('Failed to fetch first movie details');
+        }
+        const firstMovieDetails = await response.json(); // Parse the JSON data received from the server
+        updateMovieDetails(firstMovieDetails); // Update the movie details displayed on the webpage
+      } catch (error) {
+        console.error(error); // Log any errors that occur during the fetch operation
+      }
+    };
+  
+    fetchFirstMovieDetails(); // Call the function to fetch details of the first movie when the page loads
+  
+    // This function handles the process of buying a ticket.
+    const buyTicket = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/tickets', {
+          method: 'POST', // Specify that this is a POST request
+          headers: {
+            'Content-Type': 'application/json', // Specify the content type of the request body
+          },
+          body: JSON.stringify({ // Convert data to JSON format and send it in the request body
+            film_id: 1, // Assuming you always buy a ticket for the first movie
+            number_of_tickets: 1, // Assuming you always buy one ticket at a time
+          }),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to buy ticket');
+        }
+        // Reload the page to reflect the changes in available tickets
+        location.reload();
+      } catch (error) {
+        console.error(error); // Log any errors that occur during the ticket purchase process
+      }
+    };
+  
+    // This function handles the process of deleting a movie.
+    const deleteMovie = async (movieId) => {
+      try {
+        const response = await fetch(`http://localhost:3000/films/${movieId}`, {
+          method: 'DELETE', // Specify that this is a DELETE request
+        });
+        if (!response.ok) {
+          throw new Error('Failed to delete movie');
+        }
+        // Reload the page to reflect the changes in the movie list
+        location.reload();
+      } catch (error) {
+        console.error(error); // Log any errors that occur during the movie deletion process
+      }
+    };
+  
+    // This function updates the ticket count for a movie on the server.
+    const updateTicketCount = async (movieId, newTicketCount) => {
+      try {
+        const response = await fetch(`http://localhost:3000/films/${movieId}`, {
+          method: 'PATCH', // Specify that this is a PATCH request
+          headers: {
+            'Content-Type': 'application/json', // Specify the content type of the request body
+          },
+          body: JSON.stringify({ // Convert data to JSON format and send it in the request body
+            tickets_sold: newTicketCount,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to update ticket count');
+        }
+      } catch (error) {
+        console.error(error); // Log any errors that occur during the ticket count update process
+      }
+    };
+  
+    // This event listener listens for clicks on the "Buy Ticket" button.
+    const buyTicketButton = document.getElementById('buy-ticket');
+    buyTicketButton.addEventListener('click', buyTicket);
+  
+    // This event listener listens for clicks on delete buttons next to each movie in the film list.
+    filmsList.addEventListener('click', async (event) => {
+      if (event.target.classList.contains('delete-button')) { // Check if the clicked element has the class 'delete-button'
+        const movieId = event.target.dataset.id; // Retrieve the movie ID from the clicked element's dataset
+        await deleteMovie(movieId); // Delete the movie with the specified ID
+      }
+    });
+  });
+  
